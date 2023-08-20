@@ -15,7 +15,7 @@ const saveCSVFile = (filePath, content) => {
 };
 
 // Function to handle saving the prompt
-const handleSavePrompt = (promptName, systemPrompt) => {
+const pmgr_handleSavePrompt = (promptName, systemPrompt) => {
   const fileName = HARDWIRED_DIRECTORY_PATH + '/sys_prompt_' + promptName + '.csv';
   const csvContent = [['prompt_name', 'prompt'], [promptName, systemPrompt]].join('\n');
 
@@ -23,7 +23,17 @@ const handleSavePrompt = (promptName, systemPrompt) => {
   saveCSVFile(fileName, csvContent);
 };
 
-export { handleSavePrompt };
-
-// Default export
-export default handleSavePrompt;
+// Function to make the GET request to list server files
+const pmgr_listServerFiles = async () => {
+    try {
+      const response = await fetch(`/api/list_files?filePath=path/to/server/directory`);
+      const files = await response.json();
+      return files;
+    } catch (error) {
+      console.error('Error listing server files:', error);
+      return [];
+    }
+  };
+  
+export { pmgr_handleSavePrompt, pmgr_listServerFiles };
+export default pmgr_handleSavePrompt;

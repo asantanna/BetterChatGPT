@@ -1,7 +1,7 @@
 import PopupModal from '@components/PopupModal';
-import handleSavePrompt from '@components/Menu/SystemPromptManager';
+import { pmgr_handleSavePrompt, pmgr_listServerFiles } from '@components/Menu/SystemPromptManager';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PlusIcon from '@icon/PlusIcon'; // Make sure to import the PlusIcon component
 import './ContextMenu.css'; // Importing the CSS file for styling
 
@@ -14,7 +14,43 @@ const NewChat = ({ folder, generating, addChat, t }) => {
 
 
   // Sample dynamic entries
-  const items = ['item A', 'item B'];
+  const [items, setItems] = useState([]);   
+
+    // Function to list server files and populate the items array
+    const listServerFiles = async () => {
+        // Make API call to list server files (adjust endpoint as needed)
+        console.log('NewChat: Listing files...');
+        const files = await pmgr_listServerFiles();
+
+        console.log('NewChat: Listed files:', files);
+
+        // Iterate through filenames and read each file
+        for (const file of files) {
+            // Make API call to read file content (adjust endpoint as needed)
+            const contentResponse = await fetch('/api/read_file', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath: file }),
+            });
+            const content = await contentResponse.text();
+            console.log('NewChat: File content:', content);
+
+            // Extract prompt_name and prompt from CSV content (assuming CSV format)
+            const [header, row] = content.split('\n');
+            const [prompt_name, prompt] = row.split(',');
+
+            // Update items array with prompt_name and prompt
+            setItems((prevItems) => {
+            console.log('Adding item:', { prompt_name, prompt });
+            return [...prevItems, { prompt_name, prompt }];
+          });
+        }
+
+        // Add separator and "New..." to items array
+        setItems((prevItems) => [...prevItems, { prompt_name: 'separator' }, { prompt_name: 'New...' }]);
+        };
+
+        
 
   const handleContextMenu = (event) => {
     event.preventDefault();
