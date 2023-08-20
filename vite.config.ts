@@ -48,6 +48,30 @@ export default defineConfig({
         res.end(data);
       });
     });
+
+    // API to list files in directory
+    server.middlewares.use('/api/list_files', (req, res, next) => {
+        if (req.method !== 'POST') return next();
+    
+        let body = '';
+        req.on('data', chunk => {
+        body += chunk.toString();
+        });
+    
+        req.on('end', () => {
+        const { filePath } = JSON.parse(body);
+        const directoryPath = path.dirname(path.resolve(__dirname, filePath));
+    
+        fs.readdir(directoryPath, (err, files) => {
+            if (err) {
+            res.statusCode = 500;
+            res.end('Error reading directory');
+            return;
+            }
+            res.end(JSON.stringify(files));
+        });
+        });
+    });
   }
 }
 ,react(), wasm(), topLevelAwait()],
