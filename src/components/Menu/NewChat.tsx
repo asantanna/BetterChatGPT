@@ -1,5 +1,5 @@
 import PopupModal from '@components/PopupModal';
-import { pmgr_handleSavePrompt, pmgr_listServerFiles } from '@components/Menu/SystemPromptManager';
+import { pmgr_handleSavePrompt, pmgr_listServerFiles, pmgr_read_file } from '@components/Menu/SystemPromptManager';
 
 import React, { useState, useEffect } from 'react';
 import PlusIcon from '@icon/PlusIcon'; // Make sure to import the PlusIcon component
@@ -25,14 +25,9 @@ const NewChat = ({ folder, generating, addChat, t }) => {
         console.log('NewChat: Listed files:', files);
 
         // Iterate through filenames and read each file
+        setItems([]);
         for (const file of files) {
-            // Make API call to read file content (adjust endpoint as needed)
-            const contentResponse = await fetch('/api/read_file', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filePath: file }),
-            });
-            const content = await contentResponse.text();
+            const content = await pmgr_read_file(file);
             console.log('NewChat: File content:', content);
 
             // Extract prompt_name and prompt from CSV content (assuming CSV format)
@@ -47,14 +42,15 @@ const NewChat = ({ folder, generating, addChat, t }) => {
         }
 
         // Add separator and "New..." to items array
-        setItems((prevItems) => [...prevItems, { prompt_name: 'separator' }, { prompt_name: 'New...' }]);
+        setItems((prevItems) => [...prevItems]);
         };
 
         
 
-  const handleContextMenu = (event) => {
+  const handleContextMenu = async (event) => {
     event.preventDefault();
     setContextMenuPosition({ x: event.clientX, y: event.clientY });
+    await listServerFiles();
   };
 
   const handleCloseContextMenu = () => {
@@ -112,7 +108,7 @@ const handleSave = () => {
         >
           {items.map((item, index) => (
             <div key={index} className="context-menu-option">
-              {item}
+              {item.prompt_name}
             </div>
           ))}
           <hr /> {/* Separator */}

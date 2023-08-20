@@ -26,7 +26,7 @@ const pmgr_handleSavePrompt = (promptName, systemPrompt) => {
 // Function to make the GET request to list server files
 const pmgr_listServerFiles = async () => {
     try {
-      const response = await fetch(`/api/list_files?filePath=path/to/server/directory`);
+      const response = await fetch(`/api/list_files?filePath=${HARDWIRED_DIRECTORY_PATH}`);
       const files = await response.json();
       return files;
     } catch (error) {
@@ -34,6 +34,19 @@ const pmgr_listServerFiles = async () => {
       return [];
     }
   };
+
+const pmgr_read_file = async (fileName: string) => {
+    const filePath = HARDWIRED_DIRECTORY_PATH + '/' + fileName;
+      try {
+        // Make API call to read file content using GET method
+        const response = await fetch(`/api/read_file?filePath=${filePath}`);
+        const content = await response.text();
+        return content;
+    } catch (error) {
+      console.error('Error reading server file:', error);
+      return '';
+    }
+  };
   
-export { pmgr_handleSavePrompt, pmgr_listServerFiles };
+export { pmgr_handleSavePrompt, pmgr_listServerFiles, pmgr_read_file };
 export default pmgr_handleSavePrompt;

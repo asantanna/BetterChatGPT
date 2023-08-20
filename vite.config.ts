@@ -24,7 +24,9 @@ export default defineConfig({
 
       req.on('end', () => {
         const { filePath, content } = JSON.parse(body);
-        fs.writeFile(path.resolve(__dirname, filePath), content, err => {
+        const resolved_path = path.resolve(__dirname, filePath);
+        console.log('server API: resolved_path: ' + resolved_path);
+        fs.writeFile(resolved_path, content, err => {
           if (err) {
             res.statusCode = 500;
             res.end('Error writing file');
@@ -39,9 +41,10 @@ export default defineConfig({
     server.middlewares.use('/api/read_file', (req, res, next) => {
       console.log('server API: read_file');
       if (req.method !== 'GET') return next();
-
-      const filePath = req.query.path;
-      fs.readFile(path.resolve(__dirname, filePath), 'utf8', (err, data) => {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const filePath = url.searchParams.get('filePath');
+      console.log('filePath: ' + filePath);
+      fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
           res.statusCode = 500;
           res.end('Error reading file');
@@ -54,9 +57,11 @@ export default defineConfig({
     // API to list files in directory
     server.middlewares.use('/api/list_files', (req, res, next) => {
         console.log('server API: list_files');
-        console.log('query: ' + req.query);
         if (req.method !== 'GET') return next();
-        const directoryPath = req.query.filePath; // Reading the directory path from the query parameter
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const directoryPath = url.searchParams.get('filePath');
+        console.log('directoryPath: ' + directoryPath);
+
         fs.readdir(directoryPath, (err, files) => {
             if (err) {
                 console.log('server API: list_files error:' + err);
