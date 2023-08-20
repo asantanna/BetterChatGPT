@@ -1,4 +1,5 @@
 import PopupModal from '@components/PopupModal';
+import handleSavePrompt from '@components/Menu/SystemPromptManager';
 
 import React, { useState } from 'react';
 import PlusIcon from '@icon/PlusIcon'; // Make sure to import the PlusIcon component
@@ -24,10 +25,12 @@ const NewChat = ({ folder, generating, addChat, t }) => {
     setContextMenuPosition(null);
   };
 
-  const handleSave = () => {
-    alert('Save Pressed');
+  
+const handleSave = () => {
+    // Calling the handleSavePrompt function from the SystemPromptManager with the required parameters
+    handleSavePrompt(name, systemPrompt);
     setShowDialog(false);
-  };
+};
 
 
   
@@ -50,12 +53,12 @@ const NewChat = ({ folder, generating, addChat, t }) => {
         onClick={() => {
           if (!generating) addChat(folder);
         }}
-        title={folder ? String('newChat') : ''}
+        title={folder ? String('New Chat') : ''}
         onContextMenu={handleContextMenu} // Right-click listener for context menu
       >
         {folder ? (
           <div className='max-h-0 parent-sibling-hover:max-h-10 hover:max-h-10 parent-sibling-hover:py-2 hover:py-2 px-2 overflow-hidden transition-all duration-200 delay-500 text-sm flex gap-3 items-center text-gray-100'>
-            <PlusIcon /> {'newChat'}
+            <PlusIcon /> {'New Chat'}
           </div>
         ) : (
           <>
