@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import wasm from 'vite-plugin-wasm';
@@ -5,7 +7,50 @@ import topLevelAwait from 'vite-plugin-top-level-await';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), wasm(), topLevelAwait()],
+  plugins: [
+
+{
+  name: 'file-api-plugin',
+  configureServer(server) {
+    // API to write file
+    server.middlewares.use('/api/write_file', (req, res, next) => {
+      if (req.method !== 'PUT') return next();
+
+      let body = '';
+      req.on('data', chunk => {
+        body += chunk.toString();
+      });
+
+      req.on('end', () => {
+        const { filePath, content } = JSON.parse(body);
+        fs.writeFile(path.resolve(__dirname, filePath), content, err => {
+          if (err) {
+            res.statusCode = 500;
+            res.end('Error writing file');
+            return;
+          }
+          res.end('File written successfully');
+        });
+      });
+    });
+
+    // API to read file
+    server.middlewares.use('/api/read_file', (req, res, next) => {
+      if (req.method !== 'GET') return next();
+
+      const filePath = req.query.path;
+      fs.readFile(path.resolve(__dirname, filePath), 'utf8', (err, data) => {
+        if (err) {
+          res.statusCode = 500;
+          res.end('Error reading file');
+          return;
+        }
+        res.end(data);
+      });
+    });
+  }
+}
+,react(), wasm(), topLevelAwait()],
   resolve: {
     alias: {
       '@icon/': new URL('./src/assets/icons/', import.meta.url).pathname,
