@@ -14,6 +14,7 @@ export default defineConfig({
   configureServer(server) {
     // API to write file
     server.middlewares.use('/api/write_file', (req, res, next) => {
+      console.log('server API: write_file');
       if (req.method !== 'PUT') return next();
 
       let body = '';
@@ -36,6 +37,7 @@ export default defineConfig({
 
     // API to read file
     server.middlewares.use('/api/read_file', (req, res, next) => {
+      console.log('server API: read_file');
       if (req.method !== 'GET') return next();
 
       const filePath = req.query.path;
@@ -51,25 +53,18 @@ export default defineConfig({
 
     // API to list files in directory
     server.middlewares.use('/api/list_files', (req, res, next) => {
-        if (req.method !== 'POST') return next();
-    
-        let body = '';
-        req.on('data', chunk => {
-        body += chunk.toString();
-        });
-    
-        req.on('end', () => {
-        const { filePath } = JSON.parse(body);
-        const directoryPath = path.dirname(path.resolve(__dirname, filePath));
-    
+        console.log('server API: list_files');
+        console.log('query: ' + req.query);
+        if (req.method !== 'GET') return next();
+        const directoryPath = req.query.filePath; // Reading the directory path from the query parameter
         fs.readdir(directoryPath, (err, files) => {
             if (err) {
-            res.statusCode = 500;
-            res.end('Error reading directory');
-            return;
+                console.log('server API: list_files error:' + err);
+                res.statusCode = 500;
+                res.json({ error: 'Error reading directory' });
+                return;
             }
             res.end(JSON.stringify(files));
-        });
         });
     });
   }
