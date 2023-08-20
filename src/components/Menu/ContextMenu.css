@@ -16,3 +16,38 @@
 .context-menu-option:hover {
     background-color: #f5f5f5;
 }
+
+.dialog-container {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 300px;
+  }
+  .dialog-label {
+    text-align: left;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .dialog-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+.dialog-input,
+.dialog-textarea,
+.dialog-buttons button {
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.dialog-buttons button {
+  cursor: pointer;
+  background-color: #f0f0f0;
+  transition: background-color 0.3s;
+}
+
+.dialog-buttons button:hover {
+  background-color: #e0e0e0;
+}

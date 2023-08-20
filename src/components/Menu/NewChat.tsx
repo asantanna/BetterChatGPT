@@ -82,18 +82,22 @@ const NewChat = ({ folder, generating, addChat, t }) => {
           </div>
         </div>
       )}
-      
-      {showDialog && (
-        <PopupModal setIsModalOpen={setShowDialog} cancelButton={false}>
-          <div className='p-6 flex flex-col items-center gap-4'><label>Name:</label>
-        <input type="text" onChange={(e) => setName(e.target.value)} />
-        <label>System Prompt:</label>
-        <input type="text" onChange={(e) => setSystemPrompt(e.target.value)} />
+
+{showDialog && (
+  <PopupModal setIsModalOpen={setShowDialog} cancelButton={false}>
+    <div className='dialog-container'>
+        <label className='dialog-label'>Name:</label>
+        <input type="text" className='dialog-input' onChange={(e) => setName(e.target.value)} />
+        <label className='dialog-label'>System Prompt:</label>
+        <textarea className='dialog-textarea' onChange={(e) => setSystemPrompt(e.target.value)} rows='5'></textarea>
+        
+      <div className='dialog-buttons'>
         <button onClick={handleSave}>Save</button>
         <button onClick={() => setShowDialog(false)}>Cancel</button>
-                </div>
-        </PopupModal>
-      )}
+      </div>
+    </div>
+  </PopupModal>
+)}
 
     </div>
   );
